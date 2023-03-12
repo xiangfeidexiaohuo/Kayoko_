@@ -4,6 +4,6 @@ Depends: firmware (>= 13.0), mobilesubstrate, preferenceloader, ws.hbang.common 
 Version: 1.2-3
 Architecture: iphoneos-arm
 Description: Feature rich clipboard manager for iOS
-Maintainer: Traurige <hello@traurige.dev>
+Maintainer: Lessica <82flex@gmail.com>
 Author: Traurige <hello@traurige.dev>
 Section: Tweaks
