@@ -21,7 +21,7 @@
 @end
 
 @interface NSTask : NSObject
-@property (nonatomic, copy) NSArray* arguments;
-@property (nonatomic, copy) NSString* launchPath;
+@property(copy)NSArray* arguments;
+@property(copy)NSString* launchPath;
 - (void)launch;
 @end

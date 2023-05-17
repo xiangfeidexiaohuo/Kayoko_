@@ -5,25 +5,26 @@
 //  Created by Alexandra (@Traurige)
 //
 
-#import "substrate.h"
 #import "../../Manager/PasteboardManager.h"
 #import "Views/KayokoView.h"
-#import <Cephei/HBPreferences.h>
+#import "substrate.h"
+#import <AudioToolbox/AudioToolbox.h>
 
-OBJC_EXTERN KayokoView* kayokoView;
+KayokoView *kayokoView;
 
-OBJC_EXTERN HBPreferences* preferences;
-OBJC_EXTERN BOOL pfEnabled;
+NSUserDefaults *preferences;
+BOOL pfEnabled;
 
-OBJC_EXTERN NSUInteger pfMaximumHistoryAmount;
-OBJC_EXTERN BOOL pfSaveText;
-OBJC_EXTERN BOOL pfSaveImages;
-OBJC_EXTERN BOOL pfAutomaticallyPaste;
-OBJC_EXTERN BOOL pfAddTranslateOption;
-OBJC_EXTERN BOOL pfAddSongDotLinkOption;
-OBJC_EXTERN BOOL pfPlaySoundEffects;
+NSUInteger pfMaximumHistoryAmount;
+BOOL pfSaveText;
+BOOL pfSaveImages;
+BOOL pfAutomaticallyPaste;
+BOOL pfAddTranslateOption;
+BOOL pfAddSongDotLinkOption;
+CGFloat pfHeightInPoints;
 
-OBJC_EXTERN CGFloat pfHeightInPoints;
+BOOL pfPlaySoundEffects;
+BOOL pfPlayHapticFeedback;
 
-@interface UIStatusBarWindow  : UIWindow
+@interface UIStatusBarWindow : UIWindow
 @end

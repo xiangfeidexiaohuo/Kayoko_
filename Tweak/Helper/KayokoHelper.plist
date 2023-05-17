@@ -1,1 +1,1 @@
-{ Filter = { Bundles = ( "com.apple.UIKit" ); Executables = ( "druid" ); }; }
+{ Filter = { Bundles = ( "com.apple.UIKit" );Executables = ( "druid" ); }; }

@@ -1,5 +1,5 @@
 //
-//  KayokoHelper.xm
+//  KayokoHelper.m
 //  Kayoko
 //
 //  Created by Alexandra (@Traurige)
@@ -7,34 +7,12 @@
 
 #import "KayokoHelper.h"
 
-BOOL shouldShowCustomSuggestions = NO;
-
-HBPreferences* preferences = nil;
-BOOL pfEnabled = YES;
-NSUInteger pfActivationMethod = 0;
-BOOL pfAutomaticallyPaste = YES;
-BOOL pfDisablePasteTips = NO;
-
-#pragma mark - Class hooks
+#pragma mark - UIKeyboardAutocorrectionController class hooks
 
 static void (* orig_UIKeyboardAutocorrectionController_setTextSuggestionList)(UIKeyboardAutocorrectionController* self, SEL _cmd, TIAutocorrectionList* textSuggestionList);
 static void override_UIKeyboardAutocorrectionController_setTextSuggestionList(UIKeyboardAutocorrectionController* self, SEL _cmd, TIAutocorrectionList* textSuggestionList) {
     if (shouldShowCustomSuggestions) {
-        TIZephyrCandidate* historyCandidate = [[objc_getClass("TIZephyrCandidate") alloc] init];
-        [historyCandidate setLabel:@"History"];
-        [historyCandidate setFromBundleId:@"dev.traurige.kayoko"];
-
-        TIZephyrCandidate* copyCandidate = [[objc_getClass("TIZephyrCandidate") alloc] init];
-        [copyCandidate setLabel:@"Copy"];
-        [copyCandidate setFromBundleId:@"dev.traurige.kayoko"];
-
-        TIZephyrCandidate* pasteCandidate = [[objc_getClass("TIZephyrCandidate") alloc] init];
-        [pasteCandidate setLabel:@"Paste"];
-        [pasteCandidate setFromBundleId:@"dev.traurige.kayoko"];
-
-        NSArray* predictions = @[historyCandidate, copyCandidate, pasteCandidate];
-        TIAutocorrectionList* list = [objc_getClass("TIAutocorrectionList") listWithAutocorrection:nil predictions:predictions emojiList:nil];
-        orig_UIKeyboardAutocorrectionController_setTextSuggestionList(self, _cmd, list);
+        orig_UIKeyboardAutocorrectionController_setTextSuggestionList(self, _cmd, createAutocorrectionList());
     } else {
         orig_UIKeyboardAutocorrectionController_setTextSuggestionList(self, _cmd, textSuggestionList);
     }
@@ -43,25 +21,26 @@ static void override_UIKeyboardAutocorrectionController_setTextSuggestionList(UI
 static void (* orig_UIKeyboardAutocorrectionController_setAutocorrectionList)(UIKeyboardAutocorrectionController* self, SEL _cmd, TIAutocorrectionList* textSuggestionList);
 static void override_UIKeyboardAutocorrectionController_setAutocorrectionList(UIKeyboardAutocorrectionController* self, SEL _cmd, TIAutocorrectionList* textSuggestionList) {
     if (shouldShowCustomSuggestions) {
-        TIZephyrCandidate* historyCandidate = [[objc_getClass("TIZephyrCandidate") alloc] init];
-        [historyCandidate setLabel:@"History"];
-        [historyCandidate setFromBundleId:@"dev.traurige.kayoko"];
-
-        TIZephyrCandidate* copyCandidate = [[objc_getClass("TIZephyrCandidate") alloc] init];
-        [copyCandidate setLabel:@"Copy"];
-        [copyCandidate setFromBundleId:@"dev.traurige.kayoko"];
-
-        TIZephyrCandidate* pasteCandidate = [[objc_getClass("TIZephyrCandidate") alloc] init];
-        [pasteCandidate setLabel:@"Paste"];
-        [pasteCandidate setFromBundleId:@"dev.traurige.kayoko"];
-
-        NSArray* predictions = @[historyCandidate, copyCandidate, pasteCandidate];
-        TIAutocorrectionList* list = [objc_getClass("TIAutocorrectionList") listWithAutocorrection:nil predictions:predictions emojiList:nil];
-        orig_UIKeyboardAutocorrectionController_setAutocorrectionList(self, _cmd, list);
+        orig_UIKeyboardAutocorrectionController_setAutocorrectionList(self, _cmd, createAutocorrectionList());
     } else {
         orig_UIKeyboardAutocorrectionController_setAutocorrectionList(self, _cmd, textSuggestionList);
     }
 }
+
+static TIAutocorrectionList* createAutocorrectionList() {
+    NSArray* labels = @[@"History", @"Copy", @"Paste"];
+    NSMutableArray* candidates = [[NSMutableArray alloc] init];
+    for (NSUInteger i = 0; i < 3; i++) {
+        TIZephyrCandidate* candidate = [[objc_getClass("TIZephyrCandidate") alloc] init];
+        [candidate setLabel:labels[i]];
+        [candidate setFromBundleId:@"dev.traurige.kayoko"];
+        [candidates addObject:candidate];
+    }
+
+    return [objc_getClass("TIAutocorrectionList") listWithAutocorrection:nil predictions:candidates emojiList:nil];
+}
+
+#pragma mark - UIPredictionViewController class hooks
 
 static void (* orig_UIPredictionViewController_predictionView_didSelectCandidate)(UIPredictionViewController* self, SEL _cmd, TUIPredictionView* predictionView, TIZephyrCandidate* candidate);
 static void override_UIPredictionViewController_predictionView_didSelectCandidate(UIPredictionViewController* self, SEL _cmd, TUIPredictionView* predictionView, TIZephyrCandidate* candidate) {
@@ -69,7 +48,7 @@ static void override_UIPredictionViewController_predictionView_didSelectCandidat
         if ([[candidate label] isEqualToString:@"History"]) {
             CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (CFStringRef)kNotificationKeyCoreShow, nil, nil, YES);
         } else if ([[candidate label] isEqualToString:@"Copy"]) {
-            if (@available(iOS 15.0, *)) {
+            if (iOS15) {
                 UIKBInputDelegateManager* delegateManager = [[objc_getClass("UIKeyboardImpl") activeInstance] inputDelegateManager];
                 UITextRange* range = [delegateManager selectedTextRange];
                 NSString* text = [delegateManager textInRange:range];
@@ -98,6 +77,8 @@ static BOOL override_UIPredictionViewController_isVisibleForInputDelegate_inputV
     return YES;
 }
 
+#pragma mark - UIKeyboardLayoutStar class hooks
+
 static void (* orig_UIKeyboardLayoutStar_setKeyplaneName)(UIKeyboardLayoutStar* self, SEL _cmd, NSString* name);
 static void override_UIKeyboardLayoutStar_setKeyplaneName(UIKeyboardLayoutStar* self, SEL _cmd, NSString* name) {
     orig_UIKeyboardLayoutStar_setKeyplaneName(self, _cmd, name);
@@ -105,23 +86,14 @@ static void override_UIKeyboardLayoutStar_setKeyplaneName(UIKeyboardLayoutStar* 
     // the custom candidates should only be shown on the more (123) and more-alternate (#+=) keyplane
     shouldShowCustomSuggestions = [name isEqualToString:@"numbers-and-punctuation"] || [name isEqualToString:@"numbers-and-punctuation-alternate"];
 
-    if (@available(iOS 15.0, *)) {
+    if (iOS15) {
         [[[objc_getClass("UIKeyboardImpl") activeInstance] autocorrectionController] setAutocorrectionList:nil];
     } else {
         [[[objc_getClass("UIKeyboardImpl") activeInstance] autocorrectionController] setTextSuggestionList:nil];
     }
 }
 
-static BOOL override_UIKeyboardImpl_shouldShowDictationKey(UIKeyboardImpl* self, SEL _cmd) {
-    return YES;
-}
-
-// notch devices
-static void override_UISystemKeyboardDockController_dictationItemButtonWasPressed_withEvent(UISystemKeyboardDockController* self, SEL _cmd, UIEvent* event) {
-    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (CFStringRef)kNotificationKeyCoreShow, nil, nil, YES);
-}
-
-// home button devices
+// dictation trigger for home button devices
 static UIKBTree* (* orig_UIKeyboardLayoutStar_keyHitTest)(UIKeyboardLayoutStar* self, SEL _cmd, CGPoint point);
 static UIKBTree* override_UIKeyboardLayoutStar_keyHitTest(UIKeyboardLayoutStar* self, SEL _cmd, CGPoint point) {
     UIKBTree* orig = orig_UIKeyboardLayoutStar_keyHitTest(self, _cmd, point);
@@ -138,6 +110,19 @@ static void (* orig_UIKeyboardLayoutStar_didMoveToWindow)(UIKeyboardLayoutStar* 
 static void override_UIKeyboardLayoutStar_didMoveToWindow(UIKeyboardLayoutStar* self, SEL _cmd) {
     orig_UIKeyboardLayoutStar_didMoveToWindow(self, _cmd);
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (CFStringRef)kNotificationKeyCoreHide, nil, nil, YES);
+}
+
+#pragma mark - UIKeyboardImpl class hooks
+
+static BOOL override_UIKeyboardImpl_shouldShowDictationKey(UIKeyboardImpl* self, SEL _cmd) {
+    return YES;
+}
+
+#pragma mark - UISystemKeyboardDockController class hooks
+
+// dictation trigger for notch devices
+static void override_UISystemKeyboardDockController_dictationItemButtonWasPressed_withEvent(UISystemKeyboardDockController* self, SEL _cmd, UIEvent* event) {
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (CFStringRef)kNotificationKeyCoreShow, nil, nil, YES);
 }
 
 %group DictationAppearance
@@ -178,6 +163,7 @@ static void override_UIKeyboardLayoutStar_didMoveToWindow(UIKeyboardLayoutStar* 
 %end
 
 %end
+
 
 #pragma mark - Notification callbacks
 
@@ -224,7 +210,7 @@ static void paste() {
     if ([pasteboard hasStrings]) {
         NSString *pbs = [pasteboard string];
         UIKeyboardImpl *kb = [%c(UIKeyboardImpl) activeInstance];
-        if (@available(iOS 15.0, *)) {
+        if (iOS15) {
             UIKBInputDelegateManager* delegateManager = [kb inputDelegateManager];
             [delegateManager insertText:pbs];
             if ([delegateManager respondsToSelector:@selector(clearForwardingInputDelegateAndResign:)])
@@ -238,6 +224,8 @@ static void paste() {
         }
     }
 }
+
+
 
 #pragma mark - Druid UI
 
@@ -262,16 +250,25 @@ static void paste() {
 #pragma mark - Preferences
 
 static void load_preferences() {
-    preferences = [[HBPreferences alloc] initWithIdentifier:kPreferencesIdentifier];
-    [preferences registerBool:&pfEnabled default:kPreferenceKeyEnabledDefaultValue forKey:kPreferenceKeyEnabled];
-    [preferences registerUnsignedInteger:&pfActivationMethod default:kPreferenceKeyActivationMethodDefaultValue forKey:kPreferenceKeyActivationMethod];
-    [preferences registerBool:&pfAutomaticallyPaste default:kPreferenceKeyAutomaticallyPasteDefaultValue forKey:kPreferenceKeyAutomaticallyPaste];
-    [preferences registerBool:&pfDisablePasteTips default:kPreferenceKeyDisablePasteTipsDefaultValue forKey:kPreferenceKeyDisablePasteTips];
+    preferences = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"/var/mobile/Library/Preferences/%@.plist", kPreferencesIdentifier]];
+    libSandy_applyProfile("Kayoko");
+
+    [preferences registerDefaults:@{
+        kPreferenceKeyEnabled: @(kPreferenceKeyEnabledDefaultValue),
+        kPreferenceKeyActivationMethod: @(kPreferenceKeyActivationMethodDefaultValue),
+        kPreferenceKeyAutomaticallyPaste: @(kPreferenceKeyAutomaticallyPasteDefaultValue),
+        kPreferenceKeyDisablePasteTips: @(kPreferenceKeyDisablePasteTipsDefaultValue)
+    }];
+
+    pfEnabled = [[preferences objectForKey:kPreferenceKeyEnabled] boolValue];
+    pfActivationMethod = [[preferences objectForKey:kPreferenceKeyActivationMethod] unsignedIntegerValue];
+    pfAutomaticallyPaste = [[preferences objectForKey:kPreferenceKeyAutomaticallyPaste] boolValue];
+    pfDisablePasteTips = [[preferences objectForKey:kPreferenceKeyDisablePasteTips] boolValue];
 }
 
 #pragma mark - Constructor
 
-__attribute((constructor)) static void init() {
+__attribute((constructor)) static void initialize() {
     load_preferences();
 
     if (!pfEnabled) {
@@ -319,7 +316,7 @@ __attribute((constructor)) static void init() {
     }
 
     if (pfActivationMethod == kActivationMethodPredictionBar) {
-        if (@available(iOS 15.0, *)) {
+        if (iOS15) {
             MSHookMessageEx(objc_getClass("UIKeyboardAutocorrectionController"), @selector(setAutocorrectionList:), (IMP)&override_UIKeyboardAutocorrectionController_setAutocorrectionList, (IMP *)&orig_UIKeyboardAutocorrectionController_setAutocorrectionList);
         } else {
             MSHookMessageEx(objc_getClass("UIKeyboardAutocorrectionController"), @selector(setTextSuggestionList:), (IMP)&override_UIKeyboardAutocorrectionController_setTextSuggestionList, (IMP *)&orig_UIKeyboardAutocorrectionController_setTextSuggestionList);

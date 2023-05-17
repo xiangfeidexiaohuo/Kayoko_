@@ -9,17 +9,17 @@
 #import <UIKit/UIKit.h>
 #import "../../Preferences/NotificationKeys.h"
 #import "../../Preferences/PreferenceKeys.h"
-#import <Cephei/HBPreferences.h>
+#import <libSandy.h>
 
-OBJC_EXTERN BOOL shouldShowCustomSuggestions;
+#define iOS15 [[[UIDevice currentDevice] systemVersion] floatValue] >= 15.0
 
-OBJC_EXTERN HBPreferences* preferences;
-OBJC_EXTERN BOOL pfEnabled;
-OBJC_EXTERN NSUInteger pfActivationMethod;
-OBJC_EXTERN BOOL pfAutomaticallyPaste;
-OBJC_EXTERN BOOL pfDisablePasteTips;
+BOOL shouldShowCustomSuggestions = NO;
 
-static void paste();
+NSUserDefaults* preferences;
+BOOL pfEnabled;
+NSUInteger pfActivationMethod;
+BOOL pfAutomaticallyPaste;
+BOOL pfDisablePasteTips;
 
 @interface TIKeyboardCandidate : NSObject
 @end
@@ -27,6 +27,9 @@ static void paste();
 @interface TIAutocorrectionList : NSObject
 + (TIAutocorrectionList *)listWithAutocorrection:(TIKeyboardCandidate *)arg1 predictions:(NSArray *)predictions emojiList:(NSArray *)emojiList;
 @end
+
+static TIAutocorrectionList* createAutocorrectionList();
+static void paste();
 
 @interface UIKeyboardAutocorrectionController : NSObject
 - (void)setTextSuggestionList:(TIAutocorrectionList *)textSuggestionList;

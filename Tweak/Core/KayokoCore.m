@@ -6,25 +6,8 @@
 //
 
 #import "KayokoCore.h"
-#import <AudioToolbox/AudioToolbox.h>
 
-KayokoView* kayokoView = nil;
-
-HBPreferences* preferences = nil;
-BOOL pfEnabled = kPreferenceKeyEnabledDefaultValue;
-
-NSUInteger pfMaximumHistoryAmount = kPreferenceKeyMaximumHistoryAmountDefaultValue;
-BOOL pfSaveText = kPreferenceKeySaveTextDefaultValue;
-BOOL pfSaveImages = kPreferenceKeySaveImagesDefaultValue;
-BOOL pfAutomaticallyPaste = kPreferenceKeyAutomaticallyPasteDefaultValue;
-BOOL pfAddTranslateOption = kPreferenceKeyAddTranslateOptionDefaultValue;
-BOOL pfAddSongDotLinkOption = kPreferenceKeyAddSongDotLinkOptionDefaultValue;
-BOOL pfPlaySoundEffects = kPreferenceKeyPlaySoundEffectsDefaultValue;
-BOOL pfPlayHapticFeedback = kPreferenceKeyPlayHapticFeedbackDefaultValue;
-
-CGFloat pfHeightInPoints = kPreferenceKeyHeightInPointsDefaultValue;
-
-#pragma mark - Class hooks
+#pragma mark - UIStatusBarWindow class hooks
 
 // UIStatusBarWindow is sick because it's present everywhere and doesn't need uikit injection
 // it also prevents sandbox issues as the core runs on springboard (which has fs r/w)
@@ -34,8 +17,7 @@ static void override_UIStatusBarWindow_initWithFrame(UIStatusBarWindow* self, SE
 
     if (!kayokoView) {
         CGRect bounds = [[UIScreen mainScreen] bounds];
-        CGRect kayokoViewFrame = CGRectMake(0, bounds.size.height - pfHeightInPoints, bounds.size.width, pfHeightInPoints);
-        kayokoView = [[KayokoView alloc] initWithFrame:kayokoViewFrame];
+        kayokoView = [[KayokoView alloc] initWithFrame:CGRectMake(0, bounds.size.height - pfHeightInPoints, bounds.size.width, pfHeightInPoints)];
         [kayokoView setAddTranslateOption:pfAddTranslateOption];
         [kayokoView setAddSongDotLinkOption:pfAddSongDotLinkOption];
         [self addSubview:kayokoView];
@@ -84,20 +66,35 @@ static void pasted() {
     }
 }
 
+
 #pragma mark - Preferences
 
 static void load_preferences(CFNotificationCenterRef center, void *observer, CFNotificationName name, const void *object, CFDictionaryRef userInfo) {
-    preferences = [[HBPreferences alloc] initWithIdentifier:kPreferencesIdentifier];
-    [preferences registerBool:&pfEnabled default:kPreferenceKeyEnabledDefaultValue forKey:kPreferenceKeyEnabled];
-    [preferences registerUnsignedInteger:&pfMaximumHistoryAmount default:kPreferenceKeyMaximumHistoryAmountDefaultValue forKey:kPreferenceKeyMaximumHistoryAmount];
-    [preferences registerBool:&pfSaveText default:kPreferenceKeySaveTextDefaultValue forKey:kPreferenceKeySaveText];
-    [preferences registerBool:&pfSaveImages default:kPreferenceKeySaveImagesDefaultValue forKey:kPreferenceKeySaveImages];
-    [preferences registerBool:&pfAutomaticallyPaste default:kPreferenceKeyAutomaticallyPaste forKey:kPreferenceKeyAutomaticallyPaste];
-    [preferences registerBool:&pfAddSongDotLinkOption default:kPreferenceKeyAddSongDotLinkOptionDefaultValue forKey:kPreferenceKeyAddSongDotLinkOption];
-    [preferences registerBool:&pfAddTranslateOption default:kPreferenceKeyAddTranslateOptionDefaultValue forKey:kPreferenceKeyAddTranslateOption];
-    [preferences registerDouble:&pfHeightInPoints default:kPreferenceKeyHeightInPointsDefaultValue forKey:kPreferenceKeyHeightInPoints];
-    [preferences registerBool:&pfPlaySoundEffects default:kPreferenceKeyPlaySoundEffectsDefaultValue forKey:kPreferenceKeyPlaySoundEffects];
-    [preferences registerBool:&pfPlayHapticFeedback default:kPreferenceKeyPlayHapticFeedbackDefaultValue forKey:kPreferenceKeyPlayHapticFeedback];
+    preferences = [[NSUserDefaults alloc] initWithSuiteName:kPreferencesIdentifier];
+
+    [preferences registerDefaults:@{
+        kPreferenceKeyEnabled: @(kPreferenceKeyEnabledDefaultValue),
+        kPreferenceKeyMaximumHistoryAmount: @(kPreferenceKeyMaximumHistoryAmountDefaultValue),
+        kPreferenceKeySaveText: @(kPreferenceKeySaveTextDefaultValue),
+        kPreferenceKeySaveImages: @(kPreferenceKeySaveImagesDefaultValue),
+        kPreferenceKeyAutomaticallyPaste: @(kPreferenceKeyAutomaticallyPasteDefaultValue),
+        kPreferenceKeyAddSongDotLinkOption: @(kPreferenceKeyAddSongDotLinkOptionDefaultValue),
+        kPreferenceKeyAddTranslateOption: @(kPreferenceKeyAddTranslateOptionDefaultValue),
+        kPreferenceKeyHeightInPoints: @(kPreferenceKeyHeightInPointsDefaultValue),
+        kPreferenceKeyPlaySoundEffects: @(kPreferenceKeyPlaySoundEffectsDefaultValue),
+        kPreferenceKeyPlayHapticFeedback: @(kPreferenceKeyPlayHapticFeedbackDefaultValue)
+    }];
+
+    pfEnabled = [[preferences objectForKey:kPreferenceKeyEnabled] boolValue];
+    pfMaximumHistoryAmount = [[preferences objectForKey:kPreferenceKeyMaximumHistoryAmount] unsignedIntegerValue];
+    pfSaveText = [[preferences objectForKey:kPreferenceKeySaveText] boolValue];
+    pfSaveImages = [[preferences objectForKey:kPreferenceKeySaveImages] boolValue];
+    pfAutomaticallyPaste = [[preferences objectForKey:kPreferenceKeyAutomaticallyPaste] boolValue];
+    pfAddSongDotLinkOption = [[preferences objectForKey:kPreferenceKeyAddSongDotLinkOption] boolValue];
+    pfAddTranslateOption = [[preferences objectForKey:kPreferenceKeyAddTranslateOption] boolValue];
+    pfHeightInPoints = [[preferences objectForKey:kPreferenceKeyHeightInPoints] doubleValue];
+    pfPlaySoundEffects = [[preferences objectForKey:kPreferenceKeyPlaySoundEffects] doubleValue];
+    pfPlayHapticFeedback = [[preferences objectForKey:kPreferenceKeyPlayHapticFeedback] doubleValue];
 
     [[PasteboardManager sharedInstance] setMaximumHistoryAmount:pfMaximumHistoryAmount];
     [[PasteboardManager sharedInstance] setSaveText:pfSaveText];
@@ -117,7 +114,7 @@ static void load_preferences(CFNotificationCenterRef center, void *observer, CFN
 
 #pragma mark - Constructor
 
-__attribute((constructor)) static void init() {
+__attribute((constructor)) static void initialize() {
     load_preferences(NULL, NULL, NULL, NULL, NULL);
 
     if (!pfEnabled) {
