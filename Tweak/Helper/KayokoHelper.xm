@@ -30,9 +30,9 @@ static void override_UIKeyboardAutocorrectionController_setAutocorrectionList(UI
 static TIAutocorrectionList* createAutocorrectionList() {
     NSArray* labels = @[@"History", @"Copy", @"Paste"];
     NSMutableArray* candidates = [[NSMutableArray alloc] init];
-    for (NSUInteger i = 0; i < 3; i++) {
+    for (NSString* label in labels) {
         TIZephyrCandidate* candidate = [[objc_getClass("TIZephyrCandidate") alloc] init];
-        [candidate setLabel:labels[i]];
+        [candidate setLabel:label];
         [candidate setFromBundleId:@"dev.traurige.kayoko"];
         [candidates addObject:candidate];
     }
@@ -205,26 +205,24 @@ static BOOL _kApplicationIsInForeground = YES;
 @end
 
 static void paste() {
-    if (!_kApplicationIsInForeground) return;
     UIPasteboard* pasteboard = [UIPasteboard generalPasteboard];
-    if ([pasteboard hasStrings]) {
-        NSString *pbs = [pasteboard string];
-        UIKeyboardImpl *kb = [%c(UIKeyboardImpl) activeInstance];
-        if (iOS15) {
-            UIKBInputDelegateManager* delegateManager = [kb inputDelegateManager];
-            [delegateManager insertText:pbs];
-            if ([delegateManager respondsToSelector:@selector(clearForwardingInputDelegateAndResign:)])
-                [delegateManager clearForwardingInputDelegateAndResign:YES];
-            [kb updateReturnKey];
+
+    // the clipboard clears itself after around 10 minutes
+    if (![pasteboard string] && ![pasteboard image]) {
+        PasteboardItem* item = [[PasteboardManager sharedInstance] latestHistoryItem];
+        if (!item) {
+            return;
+        }
+
+        if ([item hasImage]) {
+            [pasteboard setImage:[[PasteboardManager sharedInstance] imageForItem:item]];
         } else {
-            [kb insertText:pbs];
-            if ([kb respondsToSelector:@selector(clearForwardingInputDelegateAndResign:)])
-                [kb clearForwardingInputDelegateAndResign:YES];
-            [kb updateReturnKey];
+            [pasteboard setString:[item content]];
         }
     }
-}
 
+    [[UIApplication sharedApplication] sendAction:@selector(paste:) to:nil from:nil forEvent:nil];
+}
 
 
 #pragma mark - Druid UI
