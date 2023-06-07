@@ -257,7 +257,6 @@
 				<string>dev.traurige.kayoko.preferences.reload</string>
 			</dict>
 
-
 			<dict>
 				<key>cell</key>
 				<string>PSGroupCell</string>
@@ -278,6 +277,10 @@
 				<string>PSGroupCell</string>
 				<key>label</key>
 				<string>Tools</string>
+				<key>footerText</key>
+				<string>You can clear your history by tapping on the subtitle on the history view.</string>
+				<key>isStaticText</key>
+				<true />
 			</dict>
 			<dict>
 				<key>cell</key>
@@ -294,14 +297,6 @@
 				<string>Reset Preferences</string>
 				<key>action</key>
 				<string>resetPrompt</string>
-			</dict>
-			<dict>
-				<key>cell</key>
-				<string>PSButtonCell</string>
-				<key>label</key>
-				<string>Clear History</string>
-				<key>action</key>
-				<string>clearHistoryPrompt</string>
 			</dict>
 
 			<dict>

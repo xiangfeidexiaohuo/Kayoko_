@@ -23,8 +23,8 @@
 @property (nonatomic, strong) UITapGestureRecognizer* tapGestureRecognizer;
 @property (nonatomic, strong) _UIGrabber* grabber;
 @property (nonatomic, strong) UILabel* titleLabel;
-@property (nonatomic, strong) UILabel* subtitleLabel;
-@property (nonatomic, strong) UIButton* headerButton;
+@property (nonatomic, strong) UIButton* clearButton;
+@property (nonatomic, strong) UIButton* favoritesButton;
 @property (nonatomic, strong) UIPanGestureRecognizer* panGestureRecognizer;
 @property (nonatomic, strong) KayokoHistoryTableView* historyTableView;
 @property (nonatomic, strong) KayokoFavoritesTableView* favoritesTableView;
