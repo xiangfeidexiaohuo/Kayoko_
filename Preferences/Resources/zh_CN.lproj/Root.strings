@@ -33,3 +33,4 @@
 "The \"Prediction Bar\" method displays custom suggestions on the \"More Keyboard Keyplane\" (123)."="\"预测栏\"方式在仅在原生键盘且开启\"输入预测\"功能，切换到数字符号键盘时，在键盘最上方显示：\n\"History-历史\"、\"Copy-复制\"、\"Paste-粘贴\"三个按钮。\n\n国内用户直接选择\"听写键\"方式。";
 "Tools"="工具";
 "Try out your changes by typing, copying and pasting text."="通过输入、复制和粘贴文本，来呼出键盘测试剪切板功能。";
+"You can clear your history by tapping on the subtitle on the history view."="可以通过点击历史记录视图上的副标题来清除历史/收藏记录。";
