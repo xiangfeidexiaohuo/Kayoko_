@@ -141,10 +141,10 @@
                 [self addPasteboardItem:odesliItem toHistoryWithKey:kHistoryKeyHistory];
                 [self updatePasteboardWithItem:odesliItem fromHistoryWithKey:kHistoryKeyHistory shouldAutoPaste:NO];
             } else {
-                [CommonUtil showAlertWithTitle:@"Kayoko" andMessage:[NSString stringWithFormat:@"The server didn't return the expected result.\n\nReason: \"%@\"", json[@"code"]] withDismissButtonTitle:@"Dismiss"];
+                [CommonUtil showAlertWithTitle:@"Kayoko" andMessage:[NSString stringWithFormat:@"服务器没有返回预期的结果\n\n原因: \"%@\"", json[@"code"]] withDismissButtonTitle:@"取消"];
             }
         } @catch (NSException* exception) {
-            [CommonUtil showAlertWithTitle:@"Kayoko" andMessage:[NSString stringWithFormat:@"An error occurred while trying to get the Odesli.\n\n%@", exception] withDismissButtonTitle:@"Dismiss"];
+            [CommonUtil showAlertWithTitle:@"Kayoko" andMessage:[NSString stringWithFormat:@"尝试获取 Odesli 时发生错误\n\n%@", exception] withDismissButtonTitle:@"取消"];
         }
     }];
     [task resume];
@@ -167,10 +167,10 @@
                 [self addPasteboardItem:translationItem toHistoryWithKey:kHistoryKeyHistory];
                 [self updatePasteboardWithItem:translationItem fromHistoryWithKey:kHistoryKeyHistory shouldAutoPaste:NO];
             } else {
-                [CommonUtil showAlertWithTitle:@"Kayoko" andMessage:[NSString stringWithFormat:@"The server didn't return the expected result.\n\nReason: \"%@\"", json[@"message"]] withDismissButtonTitle:@"Dismiss"];
+                [CommonUtil showAlertWithTitle:@"Kayoko" andMessage:[NSString stringWithFormat:@"服务器没有返回预期的结果\n\n原因: \"%@\"", json[@"message"]] withDismissButtonTitle:@"取消"];
             }
         } @catch (NSException* exception) {
-            [CommonUtil showAlertWithTitle:@"Kayoko" andMessage:[NSString stringWithFormat:@"An error occurred while trying to translate the text.\n\n%@", exception] withDismissButtonTitle:@"Dismiss"];
+            [CommonUtil showAlertWithTitle:@"Kayoko" andMessage:[NSString stringWithFormat:@"尝试翻译文本时发生错误\n\n%@", exception] withDismissButtonTitle:@"取消"];
         }
     }];
     [task resume];
