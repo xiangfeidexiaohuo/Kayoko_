@@ -70,7 +70,7 @@
 
         [self setFavoritesButton:[[UIButton alloc] init]];
         [[self favoritesButton] addTarget:self action:@selector(handleFavoritesButtonPressed) forControlEvents:UIControlEventTouchUpInside];
-        [self updateStyleForHeaderButton:[self favoritesButton] withImageName:@"heart" andImageSize:kFavoritesButtonImageSize andTintColor:[UIColor labelColor]];
+        [self updateStyleForHeaderButton:[self favoritesButton] withImageName:@"star" andImageSize:kFavoritesButtonImageSize andTintColor:[UIColor labelColor]];
         [[self headerView] addSubview:[self favoritesButton]];
 
         [[self favoritesButton] setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -217,14 +217,14 @@
 
         [self showContentView:[self historyTableView] andHideContentView:[self favoritesTableView] reverse:YES];
 
-        [self updateStyleForHeaderButton:[self favoritesButton] withImageName:@"heart" andImageSize:kFavoritesButtonImageSize andTintColor:[UIColor labelColor]];
+        [self updateStyleForHeaderButton:[self favoritesButton] withImageName:@"star" andImageSize:kFavoritesButtonImageSize andTintColor:[UIColor labelColor]];
     } else {
         NSArray* items = [[PasteboardManager sharedInstance] itemsFromHistoryWithKey:kHistoryKeyFavorites];
         [[self favoritesTableView] reloadDataWithItems:items];
 
         [self showContentView:[self favoritesTableView] andHideContentView:[self historyTableView] reverse:NO];
 
-        [self updateStyleForHeaderButton:[self favoritesButton] withImageName:@"heart.fill" andImageSize:kFavoritesButtonImageSize andTintColor:[UIColor systemPinkColor]];
+        [self updateStyleForHeaderButton:[self favoritesButton] withImageName:@"star.fill" andImageSize:kFavoritesButtonImageSize andTintColor:[UIColor systemPinkColor]];
     }
 
     [self triggerHapticFeedbackWithStyle:UIImpactFeedbackStyleSoft];
