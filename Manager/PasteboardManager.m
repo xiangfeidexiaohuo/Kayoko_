@@ -151,32 +151,6 @@
 }
 
 /**
- * Fetches a translation from an item's content and add it to the default history.
- */
-- (void)addTranslateItemFromItem:(PasteboardItem *)item {
-    NSString* encodedText = [[item content] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-    NSString* targetLanguage = [[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode];
-    NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"https://api.aurora.codes/v1/deepl?target_lang=%@&text=%@", targetLanguage, encodedText]];
-    NSURLSessionDataTask* task = [[NSURLSession sharedSession] dataTaskWithURL:url completionHandler:^(NSData* _Nullable data, NSURLResponse* _Nullable response, NSError* _Nullable error) {
-        @try {
-            NSDictionary* json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-            NSString* translatedText = json[@"translations"][0]['text'];
-
-            if (translatedText) {
-                PasteboardItem* translationItem = [[PasteboardItem alloc] initWithBundleIdentifier:[item bundleIdentifier] andContent:translatedText withImageNamed:nil];
-                [self addPasteboardItem:translationItem toHistoryWithKey:kHistoryKeyHistory];
-                [self updatePasteboardWithItem:translationItem fromHistoryWithKey:kHistoryKeyHistory shouldAutoPaste:NO];
-            } else {
-                [CommonUtil showAlertWithTitle:@"Kayoko" andMessage:[NSString stringWithFormat:@"服务器没有返回预期的结果\n\n原因: \"%@\"", json[@"message"]] withDismissButtonTitle:@"取消"];
-            }
-        } @catch (NSException* exception) {
-            [CommonUtil showAlertWithTitle:@"Kayoko" andMessage:[NSString stringWithFormat:@"尝试翻译文本时发生错误\n\n%@", exception] withDismissButtonTitle:@"取消"];
-        }
-    }];
-    [task resume];
-}
-
-/**
  * Removes an item from a specified history.
  *
  * @param item The item to remove.

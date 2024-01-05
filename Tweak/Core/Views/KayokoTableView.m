@@ -128,16 +128,6 @@
         [actions addObject:odesliAction];
     }
 
-    if ([item hasPlainText]) {
-        UIContextualAction* translateAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"" handler:^(UIContextualAction* _Nonnull action, __kindof UIView* _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
-            [[PasteboardManager sharedInstance] addTranslateItemFromItem:item];
-            completionHandler(YES);
-        }];
-        [translateAction setImage:[UIImage systemImageNamed:@"globe"]];
-        [translateAction setBackgroundColor:[UIColor systemBlueColor]];
-        [actions addObject:translateAction];
-    }
-
     return [UISwipeActionsConfiguration configurationWithActions:actions];
 }
 

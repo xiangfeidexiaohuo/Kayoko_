@@ -32,7 +32,6 @@ static NSString* const kHistoryKeyFavorites = @"favorites";
 - (void)pullPasteboardChanges;
 - (void)addPasteboardItem:(PasteboardItem *)item toHistoryWithKey:(NSString *)historyKey;
 - (void)addOdesliItemFromItem:(PasteboardItem *)item;
-- (void)addTranslateItemFromItem:(PasteboardItem *)item;
 - (void)updatePasteboardWithItem:(PasteboardItem *)item fromHistoryWithKey:(NSString *)historyKey shouldAutoPaste:(BOOL)shouldAutoPaste;
 - (void)removePasteboardItem:(PasteboardItem *)item fromHistoryWithKey:(NSString *)historyKey shouldRemoveImage:(BOOL)shouldRemoveImage;
 - (NSMutableArray *)itemsFromHistoryWithKey:(NSString *)historyKey;
