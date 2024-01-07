@@ -273,17 +273,25 @@ static void load_preferences() {
 
 - (id)initWithImageName:(NSString *)arg1 identifier:(id)arg2 {
     if ([arg1 isEqualToString:@"mic"])
-        return %orig(@"doc.on.clipboard", arg2);
+        return %orig(@"doc.richtext", arg2);
     else if ([arg1 isEqualToString:@"mic.fill"])
-        return %orig(@"doc.on.clipboard.fill", arg2);
+        return %orig(@"doc.richtext.fill", arg2);
+    else if ([arg1 isEqualToString:@"globe"])
+        return %orig(@"globe.asia.australia", arg2);
+    else if ([arg1 isEqualToString:@"globe.fill"])
+        return %orig(@"globe.asia.australia.fill", arg2);
     return %orig;
 }
 
 - (void)setImageName:(NSString *)arg1 {
     if ([arg1 isEqualToString:@"mic"])
-        return %orig(@"doc.on.clipboard");
+        return %orig(@"doc.richtext");
     else if ([arg1 isEqualToString:@"mic.fill"])
-        return %orig(@"doc.on.clipboard.fill");
+        return %orig(@"doc.richtext.fill");
+    else if ([arg1 isEqualToString:@"globe"])
+        return %orig(@"globe.asia.australia");
+    else if ([arg1 isEqualToString:@"globe.fill"])
+        return %orig(@"globe.asia.australia.fill");
     return %orig;
 }
 
@@ -295,7 +303,7 @@ static void load_preferences() {
     CGRect origRect = %orig;
     if (ABS(origRect.size.width - origRect.size.height) > 1.0) {
         // adjust image to its 83% but keep its center
-        CGSize newSize = CGSizeMake(origRect.size.width * 0.833, origRect.size.height * 0.833);
+        CGSize newSize = CGSizeMake(origRect.size.width * 1, origRect.size.height * 1);
         CGPoint newOrigin = CGPointMake(origRect.origin.x + (origRect.size.width - newSize.width) / 2, origRect.origin.y + (origRect.size.height - newSize.height) / 2);
         return CGRectMake(newOrigin.x, newOrigin.y, newSize.width, newSize.height);
     }
