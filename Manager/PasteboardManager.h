@@ -5,7 +5,7 @@
 //  Created by Alexandra Aurora Göttlicher
 //
 
-#import <rootless.h>
+#import <roothide.h>
 #import <UIKit/UIKit.h>
 #import "PasteboardItem.h"
 #import "../Utils/CommonUtil.h"
@@ -13,8 +13,8 @@
 #import "../Preferences/NotificationKeys.h"
 #import "../Preferences/PreferenceKeys.h"
 
-#define kHistoryPath ROOT_PATH_NS_VAR(@"/var/mobile/Library/codes.aurora.kayoko/history.json")
-#define kHistoryImagesPath ROOT_PATH_NS_VAR(@"/var/mobile/Library/codes.aurora.kayoko/images/")
+#define kHistoryPath jbroot(@"/var/mobile/Library/codes.aurora.kayoko/history.json")
+#define kHistoryImagesPath jbroot(@"/var/mobile/Library/codes.aurora.kayoko/images/")
 
 static NSString* const kHistoryKeyHistory = @"history";
 static NSString* const kHistoryKeyFavorites = @"favorites";

@@ -1,5 +1,5 @@
 Package: com.dao.kayoko
-Name: Kayoko 中文版(rootless)
+Name: Kayoko 中文版(RootHide)
 Depends: firmware (>= 13.0), mobilesubstrate, preferenceloader, com.opa334.libsandy
 Version: 2.0.2.3
 Architecture: iphoneos-arm

@@ -252,7 +252,7 @@ static void paste() {
  * Loads the user's preferences.
  */
 static void load_preferences() {
-    preferences = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:@"/var/mobile/Library/Preferences/%@.plist", kPreferencesIdentifier]];
+    preferences = [[NSUserDefaults alloc] initWithSuiteName:[NSString stringWithFormat:jbroot(@"/var/mobile/Library/Preferences/%@.plist"), kPreferencesIdentifier]];
     libSandy_applyProfile("Kayoko");
 
     [preferences registerDefaults:@{
